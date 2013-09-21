@@ -228,7 +228,7 @@ class GDash
         @error = "No dashboard called #{params[:dash]} found in #{params[:category]}/#{@top_level[params[:category]].list.join ','}."
       end
 
-      @graphs = @dashboard.graphs(options)
+      @grouped_graphs = @dashboard.grouped_graphs(options)
 
       if !query_params[:print]
         erb :dashboard

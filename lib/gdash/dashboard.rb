@@ -14,6 +14,7 @@ class GDash
       @properties[:category] = category
       @properties[:directory] = File.join(graph_templates, category, short_name)
       @properties[:graphite_render] = graphite_render
+      @properties[:groups] = {}
 
       raise "Cannot find dashboard directory #{directory}" unless File.directory?(directory)
 
@@ -99,6 +100,21 @@ class GDash
         {:name => graph_name, 
           :graphite => GraphiteGraph.new(graphs[graph_name], overrides)}
       end
+    end
+    
+    def grouped_graphs(options={})
+      mapping = {}
+      ggraphs = {:ungrouped => []}
+      @properties[:groups].each do |group, graphnames|
+        graphnames.each { |graphname| mapping[graphname] = group}
+        ggraphs[group] = []
+      end
+      
+      graphs(options).each do |graph|
+        ggraphs[mapping[graph[:name]] || :ungrouped ] << graph
+      end
+
+      ggraphs
     end
 
     def graph_by_name(name, options={})

@@ -20,9 +20,14 @@
   </div>
 </div>
 <table align=center>
+<% @grouped_graphs.each do |group, graphs| %>
+<% next if graphs.empty? %>
+<tr>
+<td span=12><%= group %></td>
+</tr>
 <tr>
 <% span=12/@graph_columns %>
-<% @graphs.each_with_index do |graph,i| %>
+<% graphs.each_with_index do |graph,i| %>
   <% if graph %>
     <% if i>0 and i%@graph_columns==0 %>
       </tr>
@@ -32,6 +37,7 @@
         <%= erb(:graph, :locals => { :graph => graph }) %>
 </td>
   <% end %>
+<% end %>
 <% end %>
 </tr>
 </table>
