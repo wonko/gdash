@@ -44,9 +44,12 @@ class GDash
   def dashboards
     dashboards = []
 
-    Dir.glob(File.join(dash_templates, '**', 'dash.yaml')).each do |yaml_file|
+    Dir.entries(dash_templates).each do |dash|
       begin
-        dashboards << YAML.load_file(yaml_file).merge({:category => category, :link => yaml_file.gsub(/\/dash.yaml$/,'')})
+        yaml_file = File.join(dash_templates, dash, "dash.yaml")
+        if File.exist?(yaml_file)
+          dashboards << YAML.load_file(yaml_file).merge({:category => category, :link => dash})
+        end
       rescue Exception => e
         p e
       end
