@@ -40,13 +40,10 @@ class GDash
       @intervals = options.delete(:intervals) || []
 
       @top_level = Hash.new
-      Dir.entries(@graph_templates).each do |category|
-        if File.directory?("#{@graph_templates}/#{category}")
-          unless ("#{category}" =~ /^\./ )
-            gdash = GDash.new(@graphite_base, "/render/", @graph_templates, category, {:width => @graph_width, :height => @graph_height})
-            @top_level["#{category}"] = gdash unless gdash.dashboards.empty?
-          end
-        end
+
+      Dir.glob(File.join(@graph_templates, "**", "dash.yaml")).map{|o| o.gsub(@graph_templates + '/', '').gsub(/\/?[^\/]*\/dash.yaml$/,'')}.each do |category|
+        gdash = GDash.new(@graphite_base, "/render/", @graph_templates, category, {:width => @graph_width, :height => @graph_height})
+        @top_level["#{category}"] = gdash unless gdash.dashboards.empty?
       end
 
       super()
@@ -192,7 +189,6 @@ class GDash
     end
 
     get '/:category/:dash/?*' do
-
       options = {}
       params["splat"] = params["splat"].first.split("/")
 
@@ -222,10 +218,12 @@ class GDash
 
       options.merge!(query_params)
 
-      if @top_level["#{params[:category]}"].list.include?(params[:dash])
-        @dashboard = @top_level[@params[:category]].dashboard(params[:dash], options)
+      category = params[:category].gsub(':','/')
+
+      if @top_level[category].list.include?(params[:dash])
+        @dashboard = @top_level[category].dashboard(params[:dash], options)
       else
-        @error = "No dashboard called #{params[:dash]} found in #{params[:category]}/#{@top_level[params[:category]].list.join ','}."
+        @error = "No dashboard called #{params[:dash]} found in #{category}/#{@top_level[category].list.join ','}."
       end
 
       @grouped_graphs = @dashboard.grouped_graphs(options)

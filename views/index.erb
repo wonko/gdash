@@ -9,7 +9,7 @@
     <tbody>
         <% @dashboard_to_display[key].sort_by{|b| b[:name].to_s}.each do |board| %>
         <tr>
-            <td><a href="<%= [@prefix, key, board[:link]].join('/') %>/"><%= board[:name] %></a></td><td><%= board[:description] %></td>
+            <td><a href="<%= [@prefix, key.gsub('/',':'), board[:link]].join('/') %>/"><%= board[:name] %></a></td><td><%= board[:description] %></td>
         </tr>
         <% end %>
     </tbody>
