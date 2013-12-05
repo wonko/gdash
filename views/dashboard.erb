@@ -19,28 +19,18 @@
   <div class="span2">
   </div>
 </div>
-<table align=center>
 <% @grouped_graphs.each do |group, graphs| %>
 <% next if graphs.empty? %>
-<tr>
-<td span=12><%= group %></td>
-</tr>
-<tr>
-<% span=12/@graph_columns %>
+<div id="<%= group.downcase %>" class="group">
+<h2><a onclick="javascript:$('#<%= group.downcase %>_graphs').toggle();"><%= group.capitalize %></a></h2>
+<div class="graphs" id="<%= group.downcase %>_graphs">
 <% graphs.each_with_index do |graph,i| %>
-  <% if graph %>
-    <% if i>0 and i%@graph_columns==0 %>
-      </tr>
-<tr>
-    <%end%>
-<td>
         <%= erb(:graph, :locals => { :graph => graph }) %>
-</td>
-  <% end %>
 <% end %>
+</div>
 <% end %>
-</tr>
-</table>
+</div>
+
 
 <script>
     $(function () {
