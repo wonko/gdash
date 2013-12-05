@@ -1,5 +1,6 @@
 require 'cgi'
 require 'json'
+require 'pp'
 
 class GDash
   class SinatraApp < ::Sinatra::Base
@@ -42,9 +43,12 @@ class GDash
       @top_level = Hash.new
 
       Dir.glob(File.join(@graph_templates, "**", "dash.yaml")).map{|o| o.gsub(@graph_templates + '/', '').gsub(/\/?[^\/]*\/dash.yaml$/,'')}.each do |category|
+        puts "Cat: #{category}"
         gdash = GDash.new(@graphite_base, "/render/", @graph_templates, category, {:width => @graph_width, :height => @graph_height})
         @top_level["#{category}"] = gdash unless gdash.dashboards.empty?
       end
+      
+      pp @top_level
 
       super()
     end
@@ -130,10 +134,12 @@ class GDash
       end
       options.merge!(query_params)
 
-      if @top_level["#{params[:category]}"].list.include?(params[:dash])
-        @dashboard = @top_level[@params[:category]].dashboard(params[:dash],options)
+      cat = @top_level[params[:category].to_s.gsub(':','/')]
+
+      if cat.list.include?(params[:dash])
+        @dashboard = cat.dashboard(params[:dash],options)
       else
-        @error = "No dashboard called #{params[:dash]} found in #{params[:category]}/#{@top_level[params[:category]].list.join ','}."
+        @error = "No dashboard called #{params[:dash]} found in #{params[:category]}/#{cat.list.join ','}."
       end
 
       if @intervals.empty?
